@@ -1,6 +1,6 @@
 use clap::{arg, Parser, Subcommand};
 
-use crate::snapcast::{Episode, DATABASE_FIELDS};
+use crate::snapcast::DATABASE_FIELDS;
 
 #[derive(Parser, Debug)]
 #[command(name = "snapcast_admin")]
@@ -8,8 +8,11 @@ pub struct Args {
     #[command(subcommand)]
     pub command: Option<Commands>,
 
+    #[arg(skip)]
     pub snadmin_feed_id: String,
+    #[arg(skip)]
     pub snadmin_token: String,
+    #[arg(skip)]
     pub snadmin_base_url: String,
 }
 
@@ -35,9 +38,6 @@ pub enum Commands {
     Info {
         /// episode id
         episode_id: String,
-        // #[arg(value_parser = EpisodeValueParser)]
-        #[arg(skip)]
-        episode: Option<Episode>,
     },
     /// Update a field of an episode.
     Update {
