@@ -49,5 +49,9 @@ pub enum Commands {
         /// the new value to set the field to
         value: String,
     },
-    // TODO: Delete command
+    /// Download an episode.
+    Download {
+        /// episode id
+        episode_id: String,
+    }, // TODO: Delete command
 }

@@ -69,6 +69,7 @@ impl std::fmt::Display for Episode {
     }
 }
 
+// Alas
 // impl From<String> for Episode {
 //     fn from(value: String) -> Self {
 //         get_episode(&value).unwrap_or_else(|err| {
