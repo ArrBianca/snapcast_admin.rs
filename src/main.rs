@@ -1,18 +1,19 @@
 use std::env;
 use std::error::Error;
+use std::fmt::Write;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use crate::cli::{Args, Commands};
+use crate::snapcast::Episode;
 use clap::Parser;
+use indicatif::{ProgressBar, ProgressState, ProgressStyle};
 use serde_json::json;
 use time::format_description::well_known::Rfc3339;
 use time::macros::format_description;
 use time::PrimitiveDateTime;
 use ureq::{get, patch};
 use url::Url;
-
-use crate::cli::{Args, Commands};
-use crate::snapcast::Episode;
 
 mod cli;
 mod snapcast;
@@ -68,7 +69,23 @@ fn handle_download(episode: Episode) -> Result<(), Box<dyn Error>> {
 
     println!("Downloading {:?}", local_path);
     let resp = get(&episode.media_url).call()?;
-    std::io::copy(&mut resp.into_reader(), &mut local_file)?;
+    let len: usize = resp.header("Content-Length").unwrap().parse()?;
+    let pb = ProgressBar::new(len as u64);
+    // from the `download.rs` example in indicatif
+    pb.set_style(
+        ProgressStyle::with_template(
+            "[{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({eta})",
+        )
+        .unwrap()
+        .with_key("eta", |state: &ProgressState, w: &mut dyn Write| {
+            write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap()
+        })
+        .progress_chars("#>-"),
+    );
+
+    std::io::copy(&mut pb.wrap_read(resp.into_reader()), &mut local_file)?;
+
+    pb.finish();
 
     Ok(())
 }

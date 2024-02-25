@@ -14,3 +14,4 @@ serde = { version = "1.0.195", features = ["derive"] }
 terminal_size = "0.3.0"
 unicode-display-width = "0.3.0"
 url = "2.5.0"
+indicatif = "0.17.8"
